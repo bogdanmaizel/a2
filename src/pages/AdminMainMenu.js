@@ -31,7 +31,6 @@ function AdminMainMenu() {
 	const [allFoodsMenu, setAllFoodsMenu] = useState([]);
 	const [currentOrders, setOrders] = useState([]);
 
-
 	const getMenu = (restaurantId) => {
 		axios.get(
 			"http://localhost:8080/api/foods/menu-" + restaurantId,

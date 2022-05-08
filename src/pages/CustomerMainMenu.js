@@ -18,24 +18,23 @@ function CustomerMainMenu() {
 		"BEVERAGE",
 	];
 
-	const customerToken = get('customer-token').access_token;
-	console.log('Customer token -> ', customerToken);
+	const customerToken = get("customer-token").access_token;
+	console.log("Customer token -> ", customerToken);
 
 	const [restaurantsList, setRestaurantsList] = useState([]);
 	const [currentMenu, setCurrentMenu] = useState([]);
 	const [currentCart, setCart] = useState([]);
 	const [orderTotal, setOrderTotal] = useState(0);
 	const [currentFilter, setFilter] = useState(categories);
+	const [orderHistory, setHistory] = useState([]);
 
 	const getAllRestaurants = () => {
-		axios.get(
-			"http://localhost:8080/api/restaurants",
-			{
-				headers: {
-					'Access-Control-Allow-Origin': '*',
-					'Authorization': 'Bearer ' + customerToken,
-				}
-			}).then((resp) => {
+		axios.get("http://localhost:8080/api/restaurants", {
+			headers: {
+				"Access-Control-Allow-Origin": "*",
+				Authorization: "Bearer " + customerToken,
+			},
+		}).then((resp) => {
 			const allRestaurants = resp.data;
 			setRestaurantsList(allRestaurants);
 			//console.log(allRestaurants);
@@ -43,18 +42,31 @@ function CustomerMainMenu() {
 	};
 
 	const getMenu = (restaurantId) => {
-		axios.get(
-			"http://localhost:8080/api/foods/menu-" + restaurantId,
-			{
-				headers: {
-					'Access-Control-Allow-Origin': '*',
-					'Authorization': 'Bearer ' + customerToken,
-				}
-			}
-		).then((resp) => {
+		axios.get("http://localhost:8080/api/foods/menu-" + restaurantId, {
+			headers: {
+				"Access-Control-Allow-Origin": "*",
+				Authorization: "Bearer " + customerToken,
+			},
+		}).then((resp) => {
 			const menu = resp.data;
 			setCurrentMenu(menu);
 			//console.log(allRestaurants);
+		});
+	};
+
+	const getOrderHistory = () => {
+		axios.get(
+			"http://localhost:8080/api/orders/from-user/" +
+				get("customer-info").customer,
+			{
+				headers: {
+					"Access-Control-Allow-Origin": "*",
+					Authorization: "Bearer " + customerToken,
+				},
+			}
+		).then((resp) => {
+			const orders = resp.data;
+			setHistory(orders);
 		});
 	};
 
@@ -80,6 +92,7 @@ function CustomerMainMenu() {
 	useEffect(() => {
 		getAllRestaurants();
 		getTotalPrice(currentCart);
+		getOrderHistory();
 	}, [currentCart]);
 
 	const addToCart = (food) => {
@@ -130,15 +143,26 @@ function CustomerMainMenu() {
 						{categories.map((cat) => {
 							return (
 								<div>
-									<input type={"checkbox"}
-										defaultChecked={currentFilter.includes(cat)}
+									<input
+										type={"checkbox"}
+										defaultChecked={currentFilter.includes(
+											cat
+										)}
 										onChange={(e) => {
 											if (!e.target.checked)
-												setFilter(currentFilter.filter(
-													(ctg => ctg !== cat)
-												));
-											else setFilter([...currentFilter, cat]);
-									}}></input>
+												setFilter(
+													currentFilter.filter(
+														(ctg) =>
+															ctg !==
+															cat
+													)
+												);
+											else
+												setFilter([
+													...currentFilter,
+													cat,
+												]);
+										}}></input>
 									<label>{cat}</label>
 								</div>
 							);
@@ -146,21 +170,27 @@ function CustomerMainMenu() {
 					</div>
 				)}
 				{currentMenu
-					.filter((menuItem) => currentFilter.includes(menuItem.category))
+					.filter((menuItem) =>
+						currentFilter.includes(menuItem.category)
+					)
 					.map((menuItem) => {
-					return (
-						<div className="card" key={menuItem.id}>
-							<h3>
-								{menuItem.name} - {menuItem.price} RON
-							</h3>
-							<p>{menuItem.category}</p>
-							<p>{menuItem.description}</p>
-							<button onClick={() => addToCart(menuItem)}>
-								Add to cart
-							</button>
-						</div>
-					);
-				})}
+						return (
+							<div className="card" key={menuItem.id}>
+								<h3>
+									{menuItem.name} - {menuItem.price}{" "}
+									RON
+								</h3>
+								<p>{menuItem.category}</p>
+								<p>{menuItem.description}</p>
+								<button
+									onClick={() =>
+										addToCart(menuItem)
+									}>
+									Add to cart
+								</button>
+							</div>
+						);
+					})}
 			</div>
 			<div>
 				{currentCart.length === 0 ? null : (
@@ -183,6 +213,18 @@ function CustomerMainMenu() {
 						</button>
 					</div>
 				)}
+				<div>
+					{orderHistory.length === 0 ? null : (
+						<div>
+							<h1>Order History:</h1>
+							{orderHistory.map(order => <div>
+								<div className="card">
+									<h3>Order # {order.id} - {order.status}</h3>
+								</div>
+							</div>)}
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	);
