@@ -4,6 +4,12 @@ import { useNavigate } from "react-router";
 import { addRestaurant } from '../api/adminAPI';
 
 function AdminAddRestaurant() {
+
+	function get(key) {
+		const info = localStorage.getItem(key);
+		return JSON.parse(info);
+	}
+
     const nav = useNavigate();
 	const nameRef = useRef();
 	const locRef = useRef();
@@ -15,8 +21,9 @@ function AdminAddRestaurant() {
 		const nameVal = nameRef.current.value;
 		const locVal = locRef.current.value;
         const zVal = zRef.current.value;
-        const adminInfo = JSON.parse(localStorage.getItem("admin-info"));
+        const adminInfo = get('admin-info');
 		const adminId = adminInfo.user;
+		const adminToken = get('admin-token');
 
 		const restaurantDTO = {
 			name: nameVal,
@@ -25,7 +32,7 @@ function AdminAddRestaurant() {
 			admin: adminId,
         };
         
-        addRestaurant(restaurantDTO)
+        addRestaurant(restaurantDTO, adminToken)
 			.then(data => {
 				console.log(data);
                 localStorage.setItem('restaurant', data);

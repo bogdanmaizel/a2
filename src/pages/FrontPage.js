@@ -4,7 +4,8 @@ import { Nav } from "react-bootstrap";
 function FrontPage() {
 	return (
 		<div className="card">
-			<h1>Welcome to PoodFanda</h1>
+			<h1>Welcome to</h1>
+			<h1 className="poodfanda">PoodFanda</h1>
 			<Nav>
 				<Nav.Item>
 					<Nav.Link

@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
-import { sendLoginAdmin, sendRegisterAdmin } from "../api/authAPI";
+import { sendLogin, sendLoginAdmin, sendRegisterAdmin } from "../api/authAPI";
 
 
 function AdminAuth() {
@@ -24,6 +24,15 @@ function AdminAuth() {
 			password: pVal,
 		};
 
+		const tokenCredentials = new URLSearchParams({
+			username: uVal,
+			password: pVal
+		});
+
+		sendLogin(tokenCredentials).then(data => {
+			localStorage.setItem("admin-token", JSON.stringify(data));
+		});
+
 		sendLoginAdmin(credentials).then((data) => {
             localStorage.setItem("admin-info", JSON.stringify(data));
             if (data.restaurant == null)
@@ -42,8 +51,7 @@ function AdminAuth() {
 			password: pVal,
 		};
 
-		sendRegisterAdmin(credentials).then(
-			(data) => {
+		sendRegisterAdmin(credentials).then(data => {
 				return <div>Register successful!</div>;
 			},
 			() => {
@@ -72,7 +80,7 @@ function AdminAuth() {
 					<input type="submit" value="Log in" />
 				</form>
 				<br />
-				{/* <h2>Or create a new account</h2>
+				<h2>Or create a new account</h2>
 				<form onSubmit={register}>
 					<input
 						type={"text"}
@@ -86,7 +94,7 @@ function AdminAuth() {
 					/>
 					<br />
 					<input type="submit" value="Register" />
-				</form> */}
+				</form>
 			</div>
 		</div>
 	);

@@ -12,7 +12,7 @@ function AdminMainMenu() {
 		"SNACK",
 		"BEVERAGE",
 	];
-	const [currentFilter, setFilter] = useState([]);
+	const [currentFilter, setFilter] = useState(categories);
 	function get(key) {
 		const info = localStorage.getItem(key);
 		return JSON.parse(info);
@@ -22,6 +22,8 @@ function AdminMainMenu() {
 	const descriptionRef = useRef();
 	const priceRef = useRef();
 
+	const adminToken = get("admin-token").access_token;
+	console.log("admin token -> " + adminToken);
 	const admin = get("admin-info");
 	const [addFoodFlag, setFlag] = useState(true);
 
@@ -29,9 +31,15 @@ function AdminMainMenu() {
 	const [allFoodsMenu, setAllFoodsMenu] = useState([]);
 	const [currentOrders, setOrders] = useState([]);
 
+
 	const getMenu = (restaurantId) => {
 		axios.get(
-			"http://localhost:8080/api/foods/menu-" + restaurantId
+			"http://localhost:8080/api/foods/menu-" + restaurantId,
+			{
+				headers: {
+					'Authorization': 'Bearer ' + adminToken,
+				}
+			}
 		).then((r) => {
 			const menu = r.data;
 			setAllFoodsMenu(menu);
@@ -41,7 +49,12 @@ function AdminMainMenu() {
 	const getOrders = (restaurantId) => {
 		axios.get(
 			"http://localhost:8080/api/orders/from-restaurant/" +
-				restaurantId
+			restaurantId,
+			{
+				headers: {
+					'Authorization': "Bearer " + adminToken,
+				}
+			}
 		).then((r) => {
 			const allOrders = r.data;
 			setOrders(allOrders);
@@ -85,7 +98,7 @@ function AdminMainMenu() {
 			category: currentCategory,
 			restaurant: restaurantVal,
 		};
-		addFood(foodItem).then(() => {
+		addFood(foodItem, adminToken).then(() => {
 			setFlag(true);
 		});
 		//setAllFoodsMenu(...allFoodsMenu, foodItem);
@@ -97,8 +110,14 @@ function AdminMainMenu() {
 	}
 
 	function updateOrder(id, cancel) {
+		console.log('UPDATE ORDER -> ' + adminToken);
 		axios.put(
-			"http://localhost:8080/api/orders/" + id + "/" + cancel
+			"http://localhost:8080/api/orders/" + id + "/" + cancel, null,
+			{
+				headers: {
+					'Authorization': 'Bearer ' + adminToken,
+				}
+			}
 		).then(() => {
 			getOrders(admin.restaurant);
 		});

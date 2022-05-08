@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useNavigate } from "react-router";
-import { sendLoginCustomer, sendRegisterCustomer } from "../api/authAPI";
+import { sendLoginCustomer, sendRegisterCustomer, sendLogin } from "../api/authAPI";
 import { Link } from 'react-router-dom';
 
 function CustomerAuth() {
@@ -22,10 +22,21 @@ function CustomerAuth() {
 			username: uVal,
 			password: pVal,
 		};
+		const tokenCredentials = new URLSearchParams({
+			username: uVal,
+			password: pVal
+		});
+
+		sendLogin(tokenCredentials).then(data => {
+			console.log("Customer token ->");
+			console.log(data);
+			localStorage.setItem('customer-token', JSON.stringify(data));
+		})
 
 		sendLoginCustomer(credentials).then((data) => {
 			localStorage.setItem("customer-info", JSON.stringify(data));
-			nav("/customer/welcome");
+			if (data!=null)
+				nav("/customer/welcome");
 		});
 	}
 

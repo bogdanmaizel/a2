@@ -1,16 +1,18 @@
 import axios from "axios";
 
+
 const url = "http://localhost:8080/api/";
 
 async function sendRegisterCustomer(dto) {
 	const r = await axios({
 		method: "POST",
 		url: url + "users/new-customer",
-		headers: {
+        headers: {
+            'Access-Control-Allow-Origin': '*',
 			"Content-Type": "application/json",
 			'Accept': "application/json",
 		},
-		data: JSON.stringify(dto),
+		data: JSON.stringify(dto)
     });
     return await r.data;
 }
@@ -21,6 +23,7 @@ async function sendRegisterAdmin(dto) {
             method: 'POST',
             url: url + 'users/new-admin',
             headers: {
+                'Access-Control-Allow-Origin': '*',
                 "Content-Type": "application/json",
                 'Accept': "application/json",
             },
@@ -36,10 +39,24 @@ async function sendLoginCustomer(dto) {
             method: 'POST',
             url: url + 'users/login-customer',
             headers: {
-                "Content-Type": "application/json",
+                "content-type": "application/json",
                 'Accept': "application/json",
             },
             data: JSON.stringify(dto)
+        }
+    );
+    return await r.data;
+}
+
+async function sendLogin(dto) {
+    const r = await axios(
+        {
+            method: 'POST',
+            url: url + 'users/login',
+            headers: {
+                "content-type": "application/x-www-form-urlencoded",
+            },
+            data: dto
         }
     );
     return await r.data;
@@ -51,7 +68,7 @@ async function sendLoginAdmin(dto) {
             method: 'POST',
             url: url + 'users/login-admin',
             headers: {
-                "Content-Type": "application/json",
+                "Content-type": "application/json",
                 'Accept': "application/json",
             },
             data: JSON.stringify(dto)
@@ -60,4 +77,4 @@ async function sendLoginAdmin(dto) {
     return await r.data;
 }
 
-export { sendLoginAdmin, sendLoginCustomer, sendRegisterAdmin, sendRegisterCustomer , url};
+export { sendLoginAdmin, sendLoginCustomer, sendRegisterAdmin, sendRegisterCustomer, sendLogin , url};

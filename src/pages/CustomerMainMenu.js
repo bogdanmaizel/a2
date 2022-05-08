@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { sendOrder } from "../api/customerAPI";
@@ -19,6 +18,9 @@ function CustomerMainMenu() {
 		"BEVERAGE",
 	];
 
+	const customerToken = get('customer-token').access_token;
+	console.log('Customer token -> ', customerToken);
+
 	const [restaurantsList, setRestaurantsList] = useState([]);
 	const [currentMenu, setCurrentMenu] = useState([]);
 	const [currentCart, setCart] = useState([]);
@@ -26,7 +28,14 @@ function CustomerMainMenu() {
 	const [currentFilter, setFilter] = useState(categories);
 
 	const getAllRestaurants = () => {
-		axios.get("http://localhost:8080/api/restaurants").then((resp) => {
+		axios.get(
+			"http://localhost:8080/api/restaurants",
+			{
+				headers: {
+					'Access-Control-Allow-Origin': '*',
+					'Authorization': 'Bearer ' + customerToken,
+				}
+			}).then((resp) => {
 			const allRestaurants = resp.data;
 			setRestaurantsList(allRestaurants);
 			//console.log(allRestaurants);
@@ -35,7 +44,13 @@ function CustomerMainMenu() {
 
 	const getMenu = (restaurantId) => {
 		axios.get(
-			"http://localhost:8080/api/foods/menu-" + restaurantId
+			"http://localhost:8080/api/foods/menu-" + restaurantId,
+			{
+				headers: {
+					'Access-Control-Allow-Origin': '*',
+					'Authorization': 'Bearer ' + customerToken,
+				}
+			}
 		).then((resp) => {
 			const menu = resp.data;
 			setCurrentMenu(menu);
@@ -91,7 +106,7 @@ function CustomerMainMenu() {
 			restaurant: currentCart[0]?.restaurant,
 			orderFoods: [...foodIds],
 		};
-		sendOrder(orderDetails).then((r) => {
+		sendOrder(orderDetails, customerToken).then((r) => {
 			setCart([]);
 			return <div>Order successful!</div>;
 		});
